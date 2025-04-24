@@ -3,7 +3,7 @@
   "version": "2.0.2",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next -p 1000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -21,9 +21,11 @@
     "@tailwindcss/postcss": "^4.0.9",
     "apexcharts": "^4.3.0",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.8.4",
     "flatpickr": "^4.6.13",
     "free-nextjs-admin-dashboard": "file:",
     "next": "15.2.3",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-apexcharts": "^1.7.0",
     "react-dnd": "^16.0.1",
