@@ -3,14 +3,16 @@ import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
-import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
+import {EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
 import React, { useState } from "react";
-import { useAuth, AuthProvider } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from 'next/navigation'; 
+import { toast } from 'react-hot-toast';
 
-import axios from 'axios';
 
 export default function SignInForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const { login, isAuthenticated, isLoading } = useAuth();
@@ -27,8 +29,8 @@ export default function SignInForm() {
     const rememberMe = isChecked;
   
     try {
-      const response = await login(email, password);
-      console.log("Login succesful", response);
+      await login(email, password);
+      router.push('/');
     } catch (error) {
       console.error(error);
     }
@@ -55,7 +57,7 @@ export default function SignInForm() {
                     <Label>
                       Email <span className="text-error-500">*</span>{" "}
                     </Label>
-                    <Input placeholder="info@gmail.com" type="email" />
+                    <Input placeholder="info@gmail.com" type="email" name="email" />
                   </div>
                   <div>
                     <Label>
@@ -64,6 +66,7 @@ export default function SignInForm() {
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
+                        name="password"
                         placeholder="Enter your password"
                       />
                       <span

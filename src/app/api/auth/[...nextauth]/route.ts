@@ -1,4 +1,3 @@
-// src/app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
@@ -11,7 +10,7 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const res = await fetch("http://127.0.0.1:3000/api/v1/admin/auth/login", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_DEV_BASE_URL}/admin-auth/login`, {
           method: "POST",
           body: JSON.stringify(credentials),
           headers: { "Content-Type": "application/json" },
