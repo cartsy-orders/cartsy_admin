@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  nextjs:
+    build: .
+    container_name: nextjs_app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "1000:1000"  # Only expose to Nginx, not publicly
+    volumes:
+      - ./public:/app/public
+      - ./.next:/app/.next  # For SSR
+      # - ./out:/app/out  # For static export (uncomment if needed)
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt:/etc/letsencrypt  # SSL certificates
+    depends_on:
+      - nextjs

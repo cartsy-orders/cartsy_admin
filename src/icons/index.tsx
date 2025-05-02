@@ -51,8 +51,20 @@ import HorizontaLDots from "./horizontal-dots.svg";
 import ChatIcon from "./chat.svg";
 import MoreDotIcon from "./more-dot.svg";
 import BellIcon from "./bell.svg";
+import Naira from './naira.svg';
+import Wallet from './wallet.svg';
+import Orders from './orders.svg';
+import Dispute from './dispute.svg';
+import Ticket from './ticket.svg';
+import Abandoned from './abandoned_cart.svg';
 
 export {
+  Abandoned,
+  Ticket,
+  Dispute,
+  Orders,
+  Wallet,
+  Naira,
   DownloadIcon,
   BellIcon,
   MoreDotIcon,

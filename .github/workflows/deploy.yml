@@ -1,0 +1,47 @@
+name: Deploy Cartsy Backend App to Name Cheap VPS
+
+on:
+  push:
+    branches:
+      - master 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Executing remote command via ssh
+        uses: appleboy/ssh-action@master
+        with:
+            host: ${{ secrets.VPS_IP }}
+            username: ${{ secrets.VPS_USER }}
+            key: ${{ secrets.VPS_SSH_KEY }}
+            command_timeout: 5m
+            script: |
+                  echo "Disabling strict host key checking..."
+                  mkdir -p ~/.ssh
+                  echo "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile=/dev/null" > ~/.ssh/config
+                  chmod 600 ~/.ssh/config
+      
+                  echo "Changing directory to /var/www/cartsy"
+                  cd /var/www/cartsy  
+      
+                  echo "Configuring Git to use PAT"
+                  git config --global credential.helper store
+                  git pull https://x-access-token:${{ secrets.PAT }}@github.com/cartsy-orders/cartsy_monolith.git master
+      
+                  echo "Building Docker image (no cache)"
+                  docker build --no-cache -t cartsy-monolith .
+      
+                  echo "Stopping and removing existing container"
+                  docker stop cartsy-monolith || true  
+                  docker rm cartsy-monolith || true 
+      
+                  echo "Pruning unused images to free space"
+                  docker image prune -f  
+      
+                  echo "Starting new container"
+                  docker run -d --name cartsy-monolith -p 3000:3000 cartsy-monolith

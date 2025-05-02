@@ -7,6 +7,7 @@ import {
 } from "../ui/table";
 import Badge from "../ui/badge/Badge";
 import Image from "next/image";
+import axios from 'axios';
 
 // Define the TypeScript interface for the table rows
 interface Product {
