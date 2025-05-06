@@ -1,7 +1,32 @@
-import NextAuth from "next-auth";
+import NextAuth, { type DefaultSession, type AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { JWT } from "next-auth/jwt";
 
-export const authOptions = {
+declare module "next-auth" {
+  interface Session extends DefaultSession {
+    user: {
+      id?: string;
+      email?: string | null;
+      [key: string]: unknown;
+    };
+  }
+
+  interface User {
+    id?: string;
+    email?: string | null;
+    [key: string]: unknown;
+  }
+}
+
+interface CustomJWT extends JWT {
+  user?: {
+    id?: string;
+    email?: string | null;
+    [key: string]: unknown;
+  };
+}
+
+export const authOptions: AuthOptions = {
   providers: [
     Credentials({
       name: "Credentials",
@@ -18,18 +43,31 @@ export const authOptions = {
 
         const user = await res.json();
         
-        if (res.ok && user) return user;
+        if (res.ok && user) return user as { id?: string; email?: string | null };
         return null; 
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: { token: any; user: any }) {
-      if (user) token.user = user;
-      return token;
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = {
+          id: user.id,
+          email: user.email,
+          ...user
+        };
+      }
+      return token as CustomJWT;
     },
-    async session({ session, token }: {session: any;  token: any}) {
-      session.user = token.user;
+    async session({ session, token }: { session: any; token: CustomJWT }) {
+      if (token.user) {
+        session.user = {
+          ...session.user,
+          id: token.user.id,
+          email: token.user.email,
+          ...token.user
+        };
+      }
       return session;
     },
   },

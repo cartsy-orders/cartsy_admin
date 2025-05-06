@@ -8,14 +8,13 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from 'next/navigation'; 
-import { toast } from 'react-hot-toast';
 
 
 export default function SignInForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  const { login, isAuthenticated, isLoading } = useAuth();
+  const { login } = useAuth();
 
 
 
@@ -26,7 +25,7 @@ export default function SignInForm() {
     const passwordInput = form.elements.namedItem('password') as HTMLInputElement;
     const email = emailInput.value;
     const password = passwordInput.value;
-    const rememberMe = isChecked;
+    // const rememberMe = isChecked;
   
     try {
       await login(email, password);

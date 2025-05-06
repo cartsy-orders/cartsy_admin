@@ -2,7 +2,6 @@
 import React from "react";
 import Badge from "../ui/badge/Badge";
 import { ArrowDownIcon, ArrowUpIcon, GroupIcon, Orders, Wallet, Dispute, Ticket, Abandoned } from "@/icons";
-import axios from 'axios';
 
 
 
