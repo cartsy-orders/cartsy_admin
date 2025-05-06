@@ -8,7 +8,7 @@ declare module "next-auth" {
       id?: string;
       email?: string | null;
       [key: string]: unknown;
-    };
+    } & DefaultSession["user"];
   }
 
   interface User {
@@ -35,46 +35,44 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_DEV_BASE_URL}/admin-auth/login`, {
-          method: "POST",
-          body: JSON.stringify(credentials),
-          headers: { "Content-Type": "application/json" },
-        });
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_DEV_BASE_URL}/admin-auth/login`, {
+            method: "POST",
+            body: JSON.stringify(credentials),
+            headers: { "Content-Type": "application/json" },
+          });
 
-        const user = await res.json();
-        
-        if (res.ok && user) return user as { id?: string; email?: string | null };
-        return null; 
+          if (!res.ok) return null;
+
+          const user = await res.json();
+          return user ? { ...user, id: user.id?.toString() } : null;
+        } catch (error) {
+          console.error("Authorization error:", error);
+          return null;
+        }
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.user = {
-          id: user.id,
-          email: user.email,
-          ...user
-        };
+        token.user = user;
       }
-      return token as CustomJWT;
+      return token;
     },
-    async session({ session, token }: { session: any; token: CustomJWT }) {
-      if (token.user) {
-        session.user = {
-          ...session.user,
-          id: token.user.id,
-          email: token.user.email,
-          ...token.user
-        };
-      }
+    async session({ session, token }: { session: DefaultSession; token: CustomJWT }) {
+      session.user = {
+        ...session.user,
+        ...token.user,
+      };
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET!,
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/signin", 
+    signIn: "/signin",
   },
 };
 
-export const { GET, POST } = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
